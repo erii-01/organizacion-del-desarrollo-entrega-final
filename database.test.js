@@ -142,4 +142,41 @@ describe('Test database', () => {
       await expect(client.query(query)).rejects.toThrow('null value in column "city"')
     })
   })
+
+  describe('Validate delete', () => {
+    let userIdToDelete
+    beforeEach(async () => {
+      const insertResult = await client.query(
+        `INSERT INTO users (email, username, birthdate, city, first_name, last_name, password, enabled, last_access_time)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+        ['user@example.com', 'user', '2024-01-02', 'La Plata', 'Juan', 'Perez', 'hashed_password', true, '2024-06-08 11:15:00-00'
+        ]
+      )
+      userIdToDelete = insertResult.rows[0].id
+    })
+    afterEach(async () => {
+      await client.query('TRUNCATE users RESTART IDENTITY')
+    })
+
+    test('Delete user by id', async () => {
+      const userExistsBefore = (await client.query('SELECT id FROM users WHERE id = $1', [userIdToDelete])).rows.length
+      expect(userExistsBefore).toBe(1)
+      const deleteResult = await client.query('DELETE FROM users WHERE id = $1',
+        [userIdToDelete]
+      )
+      expect(deleteResult.rowCount).toBe(1)
+
+      const userExistsAfter = (await client.query('SELECT id FROM users WHERE id = $1', [userIdToDelete])).rows.length
+      expect(userExistsAfter).toBe(0)
+    })
+
+    test('Should not delete a non-existent user', async () => {
+      const nonExistentId = userIdToDelete + 100
+      const deleteResult = await client.query(
+        'DELETE FROM users WHERE id = $1',
+        [nonExistentId]
+      )
+      expect(deleteResult.rowCount).toBe(0)
+    })
+  })
 })
