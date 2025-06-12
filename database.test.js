@@ -152,7 +152,7 @@ describe('Test database', () => {
         ['user@example.com', 'user', '2024-01-02', 'La Plata', 'Juan', 'Perez', 'hashed_password', true, '2024-06-08 11:15:00-00',
         ],
       );
-      userIdToDelete = insertResult.rows[0].id;
+      userIdToDelete = insertResult.rows[0].email;
     });
     afterEach(async () => {
       await client.query('TRUNCATE users RESTART IDENTITY');
