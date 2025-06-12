@@ -148,7 +148,7 @@ describe('Test database', () => {
     beforeEach(async () => {
       const insertResult = await client.query(
         `INSERT INTO users (email, username, birthdate, city, first_name, last_name, password, enabled, last_access_time)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING email`,
         ['user@example.com', 'user', '2024-01-02', 'La Plata', 'Juan', 'Perez', 'hashed_password', true, '2024-06-08 11:15:00-00',
         ],
       );
