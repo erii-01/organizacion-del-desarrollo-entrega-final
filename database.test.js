@@ -101,7 +101,7 @@ describe('Test database', () => {
       let result = await client.query(
         `INSERT INTO
          users (email, username, birthdate, city, first_name, last_name, password)
-         VALUES ('user@example.com', 'user', '2024-01-02', 'La Plata')`,
+         VALUES ('user@example.com', 'user', '2024-01-02', 'La Plata', 'Juan', 'Perez', 'hashed_password')`,
       );
 
       expect(result.rowCount).toBe(1);
@@ -159,22 +159,22 @@ describe('Test database', () => {
     });
 
     test('Delete user by id', async () => {
-      const userExistsBefore = (await client.query('SELECT id FROM users WHERE id = $1', [userIdToDelete])).rows.length;
+      const userExistsBefore = (await client.query('SELECT email FROM users WHERE email = $1', [userIdToDelete])).rows.length;
       expect(userExistsBefore).toBe(1);
       const deleteResult = await client.query(
-        'DELETE FROM users WHERE id = $1',
+        'DELETE FROM users WHERE email = $1',
         [userIdToDelete],
       );
       expect(deleteResult.rowCount).toBe(1);
 
-      const userExistsAfter = (await client.query('SELECT id FROM users WHERE id = $1', [userIdToDelete])).rows.length;
+      const userExistsAfter = (await client.query('SELECT email FROM users WHERE email = $1', [userIdToDelete])).rows.length;
       expect(userExistsAfter).toBe(0);
     });
 
     test('Should not delete a non-existent user', async () => {
       const nonExistentId = userIdToDelete + 100;
       const deleteResult = await client.query(
-        'DELETE FROM users WHERE id = $1',
+        'DELETE FROM users WHERE email = $1',
         [nonExistentId],
       );
       expect(deleteResult.rowCount).toBe(0);
